@@ -26,6 +26,13 @@
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* Запрет выделения и копирования обычного текста.
+     Поля формы и готовый текст заказа остаются доступными для копирования. */
+  body { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
+  input, textarea, select, .result-text, #result-text {
+    -webkit-user-select: text; -ms-user-select: text; user-select: text;
+  }
   html { scroll-behavior: smooth; scroll-padding-top: 86px; }
   body {
     background: var(--bg); color: var(--text); font-family: var(--font-body);
@@ -998,6 +1005,18 @@
       e.preventDefault();
       alert('Скачивание картинок запрещено! Если вам нужна работа, напишите мне в TikTok.');
     }
+  });
+
+  // Запрет копирования обычного текста (кроме полей формы и готового заказа)
+  function isCopyAllowed(target) {
+    if (!target || !target.closest) return false;
+    return !!target.closest('input, textarea, select, .result-text, #result-text');
+  }
+  document.addEventListener('copy', function(e) {
+    if (!isCopyAllowed(e.target)) e.preventDefault();
+  });
+  document.addEventListener('cut', function(e) {
+    if (!isCopyAllowed(e.target)) e.preventDefault();
   });
 
   // Защита от перетаскивания (Drag & Drop)
