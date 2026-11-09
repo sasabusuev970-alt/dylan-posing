@@ -219,6 +219,18 @@
     outline-color: var(--accent);
     box-shadow: 0 0 28px var(--accent-glow); 
   }
+
+  /* Водяной знак Dylan993! на работах (50% прозрачности) */
+  .work::after {
+    content: "";
+    position: absolute; left: 50%; top: 50%;
+    width: 82%; aspect-ratio: 900 / 433;
+    transform: translate(-50%, -50%);
+    background: url("watermark.png") center / contain no-repeat;
+    opacity: .65;
+    pointer-events: none;
+    z-index: 1;
+  }
   
   @keyframes scrollLeft {
     0% { transform: translateX(0); }
@@ -403,6 +415,19 @@
     transition: opacity .3s ease, visibility .3s ease;
   }
   .lightbox.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+  .lightbox__frame {
+    position: relative; display: inline-flex;
+    max-width: min(1100px, 92vw); max-height: 86vh;
+  }
+  .lightbox__frame::after {
+    content: "";
+    position: absolute; left: 50%; top: 50%;
+    width: 74%; aspect-ratio: 900 / 433;
+    transform: translate(-50%, -50%);
+    background: url("watermark.png") center / contain no-repeat;
+    opacity: .65;
+    pointer-events: none;
+  }
   .lightbox__img {
     max-width: min(1100px, 92vw); max-height: 86vh; width: auto; height: auto;
     object-fit: contain; border: 1px solid var(--line); border-radius: var(--radius);
@@ -1056,7 +1081,9 @@
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Просмотр работы" aria-hidden="true">
   <button type="button" class="lightbox__close" aria-label="Закрыть">×</button>
   <button type="button" class="lightbox__nav lightbox__nav--prev" aria-label="Предыдущая работа">‹</button>
-  <img class="lightbox__img" id="lightbox-img" alt="" draggable="false">
+  <div class="lightbox__frame">
+    <img class="lightbox__img" id="lightbox-img" alt="" draggable="false">
+  </div>
   <button type="button" class="lightbox__nav lightbox__nav--next" aria-label="Следующая работа">›</button>
   <div class="lightbox__counter" id="lightbox-counter"></div>
   <div class="lightbox__hint">← → листать · Esc закрыть</div>
