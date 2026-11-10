@@ -1022,8 +1022,6 @@
             <option value="4">4 человека (130 руб.)</option>
             <option value="5">5 человек (140 руб.)</option>
             <option value="6">6 человек (150 руб.)</option>
-            <option value="7">7 человек (160 руб.)</option>
-            <option value="8">8 человек (170 руб.)</option>
           </select>
         </div>
         <div class="form-group">
@@ -1601,7 +1599,9 @@
       var data = JSON.parse(savedData);
       
       document.getElementById('nickname').value = data.nickname || '';
-      document.getElementById('people_count').value = data.people_count || '1';
+      var savedPeople = parseInt(data.people_count, 10) || 1;
+      if (savedPeople > 6) savedPeople = 6;
+      document.getElementById('people_count').value = String(savedPeople);
       var currencyEl = document.querySelector('input[name="currency"][value="' + (data.currency || 'rub') + '"]');
       if (currencyEl) currencyEl.checked = true;
       updatePeopleOptions();
