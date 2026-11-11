@@ -1,0 +1,261 @@
+@charset "UTF-8";
+/* ============================================================
+   Новогодняя тема для /newyear/
+   Подключается поверх основного index.html, поэтому меняет
+   только палитру и декор. Основной сайт не затрагивается.
+   ============================================================ */
+
+:root {
+  --bg: #050a14;
+  --bg-soft: #0a1222;
+  --surface: #0c1526;
+  --surface-2: #101d33;
+  --line: #1e3149;
+  --text: #e8f0ff;
+  --muted: #94a8c6;
+  --accent: #f0c060;
+  --accent-glow: rgba(240, 192, 96, 0.45);
+  --accent-dark: #8a5a12;
+}
+
+::selection {
+  background: rgba(240, 192, 96, 0.35);
+  color: #fff;
+}
+
+/* ---------- Шапка и гирлянда ---------- */
+.topbar {
+  background: linear-gradient(to bottom, rgba(5, 10, 20, 0.82), rgba(5, 10, 20, 0));
+}
+.topbar.is-scrolled {
+  background: rgba(7, 14, 28, 0.92);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.45);
+}
+.topbar__nav a:hover {
+  color: var(--text);
+  background: rgba(240, 192, 96, 0.1);
+}
+.topbar__cta {
+  color: #1b1305;
+  text-shadow: none;
+}
+
+/* Гирлянда из огоньков по нижней кромке шапки */
+.topbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 10px;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, #ffd166 0 2.1px, transparent 2.8px),
+    radial-gradient(circle, #8fd8ff 0 2.1px, transparent 2.8px),
+    radial-gradient(circle, #ff9fbf 0 2.1px, transparent 2.8px);
+  background-size: 48px 10px, 48px 10px, 48px 10px;
+  background-position: 0 0, 16px 0, 32px 0;
+  background-repeat: repeat-x;
+  filter: drop-shadow(0 0 5px rgba(255, 209, 102, 0.75));
+  opacity: 0.9;
+  animation: nyTwinkle 3.2s ease-in-out infinite;
+}
+@keyframes nyTwinkle {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.55; }
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  background-image:
+    radial-gradient(ellipse at 50% 28%, rgba(20, 44, 82, 0.85) 0%, rgba(5, 10, 20, 0.94) 72%);
+}
+.hero::before {
+  opacity: 0.3;
+  filter: saturate(0.8) brightness(0.85);
+}
+.hero::after {
+  background:
+    radial-gradient(ellipse at center, rgba(5, 10, 20, 0.2) 0%, rgba(5, 10, 20, 0.9) 78%),
+    linear-gradient(to bottom, rgba(8, 18, 38, 0.6) 0%, transparent 35%, var(--bg) 100%);
+}
+.hero h1 {
+  color: #f4f8ff;
+  text-shadow: 0 0 40px rgba(240, 192, 96, 0.3), 0 0 90px rgba(40, 90, 160, 0.5);
+}
+.hero p {
+  color: #cfe0f8;
+}
+
+/* Бейдж «Новогодняя версия» */
+.ny-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 7px 18px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ffe6a8;
+  background: linear-gradient(135deg, rgba(240, 192, 96, 0.16), rgba(240, 192, 96, 0.04));
+  border: 1px solid rgba(240, 192, 96, 0.42);
+  box-shadow: 0 0 22px rgba(240, 192, 96, 0.16), inset 0 0 18px rgba(240, 192, 96, 0.08);
+  animation: rise 1.4s cubic-bezier(.2, .7, .2, 1) both;
+}
+.ny-badge span {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+@media (max-width: 520px) {
+  .ny-badge { font-size: 0.68rem; letter-spacing: 0.12em; padding: 6px 14px; }
+}
+
+/* ---------- Кнопки и линии ---------- */
+.btn {
+  color: #1b1305;
+  text-shadow: none;
+  background: linear-gradient(135deg, #f7d488, #c9902a);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+.btn:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 26px rgba(240, 192, 96, 0.45), 0 0 60px rgba(240, 192, 96, 0.22);
+}
+.rule {
+  background: linear-gradient(90deg, var(--accent), #9ed8ff);
+  box-shadow: 0 0 14px rgba(240, 192, 96, 0.45);
+}
+h2 {
+  text-shadow: 0 0 30px rgba(120, 180, 255, 0.16);
+}
+
+/* ---------- Секции ---------- */
+.pricing,
+.order {
+  background: rgba(8, 15, 29, 0.82);
+}
+#policy[style],
+#faq[style] {
+  background: rgba(8, 15, 29, 0.82) !important;
+}
+
+/* ---------- Карточки цен: морозные рамки ---------- */
+.card {
+  background: linear-gradient(180deg, rgba(17, 30, 52, 0.96), rgba(9, 17, 31, 0.96));
+}
+.card::before {
+  border-color: rgba(150, 200, 255, 0.2);
+}
+.card::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgba(170, 215, 255, 0.6), transparent);
+  pointer-events: none;
+}
+.card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 30px rgba(240, 192, 96, 0.24);
+}
+.card:hover::before {
+  border-color: rgba(255, 230, 173, 0.55);
+}
+.price-alt {
+  color: #e8c479;
+}
+.card li {
+  color: #c8d6ea;
+}
+
+/* ---------- Дополнения и правила ---------- */
+.addon {
+  background: rgba(12, 21, 38, 0.92);
+  border-left-color: var(--accent);
+}
+.addon:hover {
+  border-left-color: #ffe6ad;
+  box-shadow: 0 0 22px rgba(240, 192, 96, 0.22);
+}
+
+/* ---------- FAQ ---------- */
+.faq-item[open] {
+  border-color: rgba(240, 192, 96, 0.55);
+  box-shadow: 0 0 22px rgba(240, 192, 96, 0.14);
+}
+
+/* ---------- Калькулятор и результат ---------- */
+.calc-display {
+  box-shadow: 0 0 30px rgba(240, 192, 96, 0.18);
+}
+.tex-tab.is-active {
+  color: #1b1305;
+}
+.tex-stage {
+  background: radial-gradient(ellipse at 50% 42%, rgba(120, 190, 255, 0.14) 0%, transparent 68%);
+}
+
+/* ---------- Портфолио и лайтбокс ---------- */
+.work:hover {
+  box-shadow: 0 0 28px rgba(240, 192, 96, 0.3);
+}
+.lightbox {
+  background: rgba(5, 10, 20, 0.95);
+}
+.lightbox__img {
+  box-shadow: 0 0 60px rgba(120, 180, 255, 0.22);
+}
+
+/* ---------- Туман, загрузка, курсор ---------- */
+.fog-blob:nth-child(1) { background: rgba(64, 140, 220, 0.3); }
+.fog-blob:nth-child(2) { background: rgba(24, 64, 120, 0.45); }
+.fog-blob:nth-child(3) { background: rgba(200, 225, 255, 0.18); }
+
+.loader {
+  background: radial-gradient(ellipse at 50% 42%, #0b1a30 0%, #050a14 68%);
+}
+.loader::before { background: rgba(64, 140, 220, 0.55); }
+.loader::after { background: rgba(240, 192, 96, 0.35); }
+.loader__logo {
+  text-shadow: 0 0 34px rgba(240, 192, 96, 0.4), 0 0 80px rgba(40, 90, 160, 0.6);
+}
+
+.cursor-dot {
+  background: #eaf4ff;
+  box-shadow: 0 0 10px rgba(150, 200, 255, 0.6), 0 0 24px rgba(240, 192, 96, 0.35);
+}
+.cursor-dot.is-active {
+  background: rgba(240, 192, 96, 0.12);
+  border-color: rgba(255, 230, 173, 0.95);
+  box-shadow: 0 0 18px rgba(240, 192, 96, 0.4),
+              0 0 40px rgba(120, 180, 255, 0.3),
+              inset 0 0 14px rgba(240, 192, 96, 0.25);
+}
+
+/* ---------- Подвал ---------- */
+footer {
+  border-top-color: rgba(240, 192, 96, 0.22);
+  color: #8fa3c0;
+}
+
+/* ---------- Снегопад ---------- */
+#ny-snow {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* ---------- Слабое железо / уменьшенное движение ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .topbar::after { animation: none; }
+}
