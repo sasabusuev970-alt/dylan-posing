@@ -734,6 +734,22 @@
     .cursor-dot.is-active::after { opacity: 1; }
     .cursor-dot.is-press { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
   }
+  /* ---------- Экономия ресурсов на слабых устройствах ---------- */
+  .gallery-wrapper.is-offscreen .gallery-track { animation-play-state: paused; }
+
+  html.eco .fog-container,
+  html.eco .loader { display: none; }
+
+  html.eco .topbar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--bg);
+  }
+
+  html.eco .gallery-wrapper {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
 </style>
 </head>
 <body>
@@ -803,8 +819,8 @@
 
       <div class="texture-switch" id="texture-switch" data-state="metal">
         <div class="tex-stage">
-          <img class="tex-layer tex-metal" src="metal.png" alt="Металлическое тело" draggable="false">
-          <img class="tex-layer tex-matte" src="notmetal.png" alt="Неметаллическое тело" draggable="false">
+          <img class="tex-layer tex-metal" src="metal.png" alt="Металлическое тело" draggable="false" loading="lazy" decoding="async">
+          <img class="tex-layer tex-matte" src="notmetal.png" alt="Неметаллическое тело" draggable="false" loading="lazy" decoding="async">
         </div>
 
         <div class="tex-controls" role="tablist" aria-label="Тип тела">
@@ -1516,6 +1532,26 @@
       behavior: "smooth"
     });
   });
+  // ---------- Слабое устройство: упрощаем эффекты ----------
+  var REDUCE_MOTION = false;
+  try {
+    REDUCE_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch (e) { /* старый браузер */ }
+
+  var ECO = (function () {
+    try {
+      if (REDUCE_MOTION) return true;
+      if (navigator.connection && navigator.connection.saveData) return true;
+      if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) return true;
+      if (navigator.deviceMemory && navigator.deviceMemory <= 4) return true;
+      return window.matchMedia('(max-width: 768px)').matches;
+    } catch (e) {
+      return false;
+    }
+  })();
+
+  if (ECO) document.documentElement.classList.add('eco');
+
   // --- Фон с частицами ---
   const canvas = document.getElementById('particles-canvas');
   const ctx = canvas.getContext('2d');
@@ -1560,23 +1596,46 @@
 
   function initParticles() {
     particles = [];
-    let particleCount = window.innerWidth < 768 ? 30 : 70;
-    for (let i = 0; i < particleCount; i++) {
+    var particleCount = ECO ? 10 : (window.innerWidth < 768 ? 30 : 70);
+    for (var i = 0; i < particleCount; i++) {
       particles.push(new Particle());
     }
   }
 
+  var particlesRunning = false;
+
   function animateParticles() {
+    if (!particlesRunning) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => {
-      p.update();
-      p.draw();
-    });
+    for (var i = 0; i < particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+    }
     requestAnimationFrame(animateParticles);
   }
 
+  function startParticles() {
+    if (REDUCE_MOTION || particlesRunning) return;
+    particlesRunning = true;
+    requestAnimationFrame(animateParticles);
+  }
+
+  function stopParticles() { particlesRunning = false; }
+
   initParticles();
-  animateParticles();
+  if (REDUCE_MOTION) {
+    // Без анимации рисуем один статичный кадр
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var p = 0; p < particles.length; p++) particles[p].draw();
+  } else {
+    startParticles();
+  }
+
+  // Не тратим батарею, когда вкладка скрыта
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) stopParticles();
+    else startParticles();
+  });
   // --- Сохранение данных формы ---
   function saveFormData() {
     var formData = {
@@ -1771,6 +1830,7 @@
 
   // ---------- Портфолио: автозагрузка работ из gallery.json ----------
   var PORTFOLIO_FOLDER = 'portfolio/';
+  var PORTFOLIO_SMALL = PORTFOLIO_FOLDER + 'sm/';
   // Резервный список: используется, только если gallery.json не удалось прочитать
   // (например, если открыть index.html двойным кликом через file://)
   var PORTFOLIO_FALLBACK = ['1.jpg', '2.jpg', '3.jpg', '4.jpg'];
@@ -1783,17 +1843,33 @@
     figure.setAttribute('aria-label', 'Открыть работу крупнее: ' + fileName.replace(/\.[^.]+$/, ''));
 
     var img = document.createElement('img');
-    img.src = PORTFOLIO_FOLDER + fileName;
+    var isJpeg = /\.(jpe?g)$/i.test(fileName);
+    var smallUrl = PORTFOLIO_SMALL + fileName;
+    var fullUrl = PORTFOLIO_FOLDER + fileName;
+    // в ленте карточка 280px — лёгкой версии 700px хватает с запасом
+    img.src = isJpeg ? smallUrl : fullUrl;
     img.alt = 'Работа Dylan.Posing: ' + fileName.replace(/\.[^.]+$/, '');
     img.draggable = false;                   // защита от перетаскивания
     img.decoding = 'async';
     img.onerror = function () {
       this.onerror = null;
+      // если лёгкой версии нет — пробуем полную
+      if (isJpeg && this.src.indexOf('/sm/') !== -1) {
+        this.src = fullUrl;
+        return;
+      }
       this.src = 'https://via.placeholder.com/600x600/111/fff?text=Art';
     };
 
     figure.appendChild(img);
     return figure;
+  }
+
+  // На телефонах и слабых устройствах лайтбоксу хватает версии 700px
+  function portfolioImageUrl(fileName) {
+    var isJpeg = /\.(jpe?g)$/i.test(fileName);
+    var small = ECO || window.matchMedia('(max-width: 900px)').matches;
+    return (small && isJpeg ? PORTFOLIO_SMALL : PORTFOLIO_FOLDER) + fileName;
   }
 
   // Лента портфолио должна всегда перекрывать экран: иначе справа
@@ -1869,6 +1945,18 @@
     galleryResizeTimer = setTimeout(function () { layoutGallery(); }, 150);
   });
 
+  // Останавливаем ленту, когда она вне экрана — экономия батареи
+  (function initGalleryVisibility() {
+    var wrapper = document.querySelector('.gallery-wrapper');
+    if (!wrapper || !('IntersectionObserver' in window)) return;
+    var galleryObserver = new IntersectionObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        wrapper.classList.toggle('is-offscreen', !entries[i].isIntersecting);
+      }
+    }, { rootMargin: '120px' });
+    galleryObserver.observe(wrapper);
+  })();
+
   function initPortfolio() {
     fetch('gallery.json', { cache: 'no-store' })
       .then(function (response) {
@@ -1898,7 +1986,7 @@
   function showLightboxSlide() {
     var file = lightboxFiles[lightboxIndex];
     if (!file || !lightboxImg) return;
-    lightboxImg.src = PORTFOLIO_FOLDER + file;
+    lightboxImg.src = portfolioImageUrl(file);
     lightboxImg.alt = 'Работа Dylan.Posing: ' + file.replace(/\.[^.]+$/, '');
     if (lightboxCounter) {
       lightboxCounter.textContent = (lightboxIndex + 1) + ' / ' + lightboxFiles.length;
