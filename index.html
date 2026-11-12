@@ -253,6 +253,14 @@
     width: 100%; height: 100%; object-fit: contain; display: block;
     pointer-events: none; user-select: none; -webkit-user-drag: none;
   }
+  /* водяной знак только на финальном кадре */
+  .stage-card[data-index="3"] .stage-media::after {
+    content: ""; position: absolute; left: 50%; top: 50%;
+    width: 82%; aspect-ratio: 900 / 433;
+    transform: translate(-50%, -50%);
+    background: url("watermark.png") center / contain no-repeat;
+    opacity: .65; pointer-events: none;
+  }
   .stage-num {
     position: absolute; top: 10px; left: 10px;
     padding: 4px 10px; font-family: var(--font-head); font-size: .8rem; letter-spacing: .1em;
@@ -545,6 +553,9 @@
     width: min(780px, 90vw); height: min(780px, 90vw);
   }
   .lightbox.is-stages .lightbox__frame::after { display: none; }
+  .lightbox.is-stages.is-stage-final .lightbox__frame::after {
+    display: block; width: 62%;
+  }
   .lightbox.is-stages .lightbox__img {
     width: 100%; height: 100%;
     background: #0d0b13;
@@ -2187,6 +2198,9 @@
     }
     if (lightboxCounter) {
       lightboxCounter.textContent = (lightboxIndex + 1) + ' / ' + lightboxFiles.length;
+    }
+    if (lightboxEl) {
+      lightboxEl.classList.toggle('is-stage-final', lightboxMode === 'stages' && lightboxIndex === 3);
     }
   }
 
