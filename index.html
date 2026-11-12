@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dylan.Posing | Индивидуальный арт и аватарки для Roblox</title>
-<meta name="description" content="Индивидуальный арт и аватарки для Roblox: парный и одиночный позинг, текстуры тел. Заказ от 100 руб. или 120 R$, оплата в рублях или Robux.">
+<title>Dylan.Posing | Индивидуальный позинг и аватарки для Roblox</title>
+<meta name="description" content="Индивидуальный позинг и аватарки для Roblox: парный и одиночный позинг, текстуры тел. Заказ от 100 руб. или 120 R$, оплата в рублях или Robux.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Dylan.Posing">
 <meta property="og:locale" content="ru_RU">
-<meta property="og:title" content="Dylan.Posing | Индивидуальный арт и аватарки для Roblox">
+<meta property="og:title" content="Dylan.Posing | Индивидуальный позинг и аватарки для Roblox">
 <meta property="og:description" content="Парный и одиночный позинг, текстуры тел. Заказ от 100 ₽ / 120 R$, оплата в рублях или Robux через Roblox Plus.">
 <meta property="og:url" content="https://dylan-posing.online/">
 <meta property="og:image" content="https://dylan-posing.online/og-cover.jpg">
@@ -16,7 +16,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Работа Dylan.Posing — пара персонажей Roblox">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Dylan.Posing | Индивидуальный арт и аватарки для Roblox">
+<meta name="twitter:title" content="Dylan.Posing | Индивидуальный позинг и аватарки для Roblox">
 <meta name="twitter:description" content="Парный и одиночный позинг, текстуры тел. Заказ от 100 ₽ / 120 R$, оплата в рублях или Robux через Roblox Plus.">
 <meta name="twitter:image" content="https://dylan-posing.online/og-cover.jpg">
 <link rel="canonical" href="https://dylan-posing.online/">
@@ -55,6 +55,8 @@
   }
   img { display: block; max-width: 100%; }
   a { color: inherit; }
+  main p a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  main p a:hover { color: #fff; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
   .wrap { width: min(1120px, 100% - 40px); margin-inline: auto; }
@@ -194,6 +196,24 @@
   .btn:hover {
     transform: translateY(-2px); border-color: rgba(255,255,255,0.35);
     box-shadow: 0 0 26px var(--accent-glow), 0 0 60px rgba(139,92,246,0.3);
+  }
+
+  /* ---------- Фильтр портфолио ---------- */
+  .portfolio-filter {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    margin-top: 26px; margin-bottom: 26px;
+  }
+  .filter-btn {
+    padding: 10px 22px; font-family: var(--font-head); font-size: .9rem; letter-spacing: .08em;
+    color: var(--muted); background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); cursor: pointer;
+    transition: color .3s, border-color .3s, box-shadow .3s, background .3s;
+  }
+  .filter-btn:hover { color: var(--text); border-color: var(--accent); }
+  .filter-btn.is-active {
+    color: #fff; border-color: var(--accent);
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    box-shadow: 0 0 22px var(--accent-glow);
   }
 
   /* ---------- Gallery ---------- */
@@ -373,6 +393,19 @@
 
   /* ---------- Footer ---------- */
   footer { padding: 36px 0; text-align: center; color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line); }
+  .social-link {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 12px 24px; margin-bottom: 14px;
+    font-family: var(--font-head); letter-spacing: .06em; color: var(--text);
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    text-decoration: none; transition: color .3s, border-color .3s, box-shadow .3s;
+  }
+  .social-link:hover {
+    color: #fff; border-color: var(--accent);
+    box-shadow: 0 0 22px var(--accent-glow);
+  }
+  .social-link__icon { width: 20px; height: 20px; display: block; }
+  .footer-copy { opacity: .8; }
 
   /* ---------- Как проходит заказ ---------- */
   .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; counter-reset: step; }
@@ -790,7 +823,7 @@
 <header class="hero" id="top">
   <div class="wrap">
     <h1>Dylan<span class="dot">.</span>Posing</h1>
-    <p>Индивидуальный арт и аватарки для Roblox</p>
+    <p>Индивидуальный позинг и аватарки для Roblox</p>
     <a href="#pricing" class="btn">Заказать</a>
   </div>
 </header>
@@ -802,6 +835,11 @@
       <h2>Портфолио</h2>
       <div class="rule"></div>
       <p class="section-intro">Несколько последних работ. Нажмите на работу, чтобы рассмотреть её крупнее.</p>
+      <div class="portfolio-filter" id="portfolio-filter" role="tablist" aria-label="Фильтр работ">
+        <button type="button" class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true">Все</button>
+        <button type="button" class="filter-btn" data-filter="single" role="tab" aria-selected="false">Одиночные</button>
+        <button type="button" class="filter-btn" data-filter="pair" role="tab" aria-selected="false">Парные</button>
+      </div>
     </div>
     
     <div class="gallery-wrapper">
@@ -911,7 +949,7 @@
       <div class="steps">
         <div class="step">
           <h3>Заявка</h3>
-          <p>Заполняете форму ниже, копируете готовый текст и отправляете мне в TikTok.</p>
+          <p>Заполняете форму ниже, копируете готовый текст и отправляете мне в <a href="https://www.tiktok.com/@dylan_993l" target="_blank" rel="noopener">TikTok</a>.</p>
         </div>
         <div class="step">
           <h3>Детали и предоплата</h3>
@@ -923,7 +961,7 @@
         </div>
         <div class="step">
           <h3>Готовая работа</h3>
-          <p>После остатка 50% получаете финальный арт в хорошем качестве.</p>
+          <p>После остатка 50% получаете готовый позинг в хорошем качестве.</p>
         </div>
       </div>
     </div>
@@ -1117,7 +1155,7 @@
         <h3>Ваши данные для заказа:</h3>
         <div class="result-text" id="result-text"></div>
         <button type="button" class="btn copy-btn" onclick="copyOrder()">Скопировать текст</button>
-        <p style="text-align:center; margin-top:12px; font-size:0.85rem; color:var(--muted);">Затем отправьте этот текст мне в TikTok!</p>
+        <p style="text-align:center; margin-top:12px; font-size:0.85rem; color:var(--muted);">Затем отправьте этот текст мне в <a href="https://www.tiktok.com/@dylan_993l" target="_blank" rel="noopener">TikTok</a>!</p>
       </div>
 
     </div>
@@ -1125,7 +1163,13 @@
 </main>
 
 <footer>
-  <div class="wrap">&copy; Dylan.Posing 2026</div>
+  <div class="wrap">
+    <a class="social-link" href="https://www.tiktok.com/@dylan_993l" target="_blank" rel="noopener">
+      <svg class="social-link__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M16.6 5.82A5.6 5.6 0 0 1 15.3 2h-3.2v13.1a2.7 2.7 0 1 1-1.9-2.58V9.24a6 6 0 1 0 5.1 5.93V8.98a8.8 8.8 0 0 0 5.2 1.7V7.4a5.6 5.6 0 0 1-3.9-1.58Z"/></svg>
+      TikTok · @dylan_993l
+    </a>
+    <div class="footer-copy">&copy; Dylan.Posing 2026</div>
+  </div>
 </footer>
 
 <!-- Лайтбокс портфолио -->
@@ -1835,6 +1879,19 @@
   // (например, если открыть index.html двойным кликом через file://)
   var PORTFOLIO_FALLBACK = ['6.jpg', '5.jpg', '4.jpg', '3.jpg', '2.jpg', '1.jpg'];
 
+  // Категории работ для фильтра. Новые работы без категории
+  // показываются и в «Одиночных», и в «Парных».
+  var PORTFOLIO_TAGS = {
+    '1.jpg': 'pair',
+    '2.jpg': 'single',
+    '3.jpg': 'single',
+    '4.jpg': 'pair',
+    '5.jpg': 'single',
+    '6.jpg': 'single'
+  };
+  var portfolioAllFiles = [];
+  var portfolioFilter = 'all';
+
   function createWork(fileName) {
     var figure = document.createElement('figure');
     figure.className = 'work';               // класс .work даёт зум при ховере и защиту от ПКМ
@@ -1935,9 +1992,38 @@
   }
 
   function renderPortfolio(files) {
-    galleryFiles = files.slice();
+    portfolioAllFiles = files.slice();
+    applyPortfolioFilter(portfolioFilter);
+  }
+
+  function applyPortfolioFilter(filter) {
+    portfolioFilter = filter || 'all';
+    var files = portfolioAllFiles.filter(function (name) {
+      if (portfolioFilter === 'all') return true;
+      var tag = PORTFOLIO_TAGS[name];
+      return !tag || tag === portfolioFilter;
+    });
+    if (!files.length) files = portfolioAllFiles.slice();
+    galleryFiles = files;
     layoutGallery(0, true);
   }
+
+  (function initPortfolioFilter() {
+    var box = document.getElementById('portfolio-filter');
+    if (!box) return;
+    var buttons = Array.prototype.slice.call(box.querySelectorAll('.filter-btn'));
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('is-active')) return;
+        buttons.forEach(function (b) {
+          var active = b === btn;
+          b.classList.toggle('is-active', active);
+          b.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        applyPortfolioFilter(btn.getAttribute('data-filter'));
+      });
+    });
+  })();
 
   var galleryResizeTimer = null;
   window.addEventListener('resize', function () {
