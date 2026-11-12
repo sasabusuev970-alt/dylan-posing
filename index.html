@@ -216,6 +216,48 @@
     box-shadow: 0 0 22px var(--accent-glow);
   }
 
+  /* ---------- Этапы разработки ---------- */
+  .stages-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+    list-style: none; padding: 0; margin: 28px 0 0;
+  }
+  .stage-card {
+    padding: 14px 14px 18px;
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--line); border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color .35s, box-shadow .35s, transform .35s;
+  }
+  .stage-card:hover, .stage-card:focus-visible {
+    border-color: var(--accent); box-shadow: 0 0 28px var(--accent-glow);
+    transform: translateY(-3px); outline: none;
+  }
+  .stage-media {
+    position: relative; aspect-ratio: 1 / 1; overflow: hidden;
+    border-radius: var(--radius); background: #0d0b13; border: 1px solid var(--line);
+  }
+  .stage-media img {
+    width: 100%; height: 100%; object-fit: contain; display: block;
+    pointer-events: none; user-select: none; -webkit-user-drag: none;
+  }
+  .stage-num {
+    position: absolute; top: 10px; left: 10px;
+    padding: 4px 10px; font-family: var(--font-head); font-size: .8rem; letter-spacing: .1em;
+    color: #fff; background: rgba(17, 14, 26, .78);
+    border: 1px solid var(--accent); border-radius: var(--radius);
+  }
+  .stage-caption {
+    margin: 14px 0 0; text-align: center;
+    font-family: var(--font-head); font-size: .95rem; line-height: 1.35; color: var(--text);
+  }
+  @media (max-width: 900px) {
+    .stages-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .stage-caption { font-size: .88rem; }
+  }
+  @media (max-width: 400px) {
+    .stages-grid { grid-template-columns: 1fr; }
+  }
+
   /* ---------- Gallery ---------- */
   .gallery-wrapper {
     position: relative; width: 100%; overflow: hidden;
@@ -848,6 +890,46 @@
     </div>
   </section>
   
+  <!-- STAGES -->
+  <section id="stages">
+    <div class="wrap">
+      <h2>Этапы разработки</h2>
+      <div class="rule"></div>
+      <p class="section-intro">Как из обычного аватара получается готовый позинг: от настройки персонажа до финального кадра. Нажмите на этап, чтобы рассмотреть крупнее.</p>
+
+      <ol class="stages-grid" id="stages-grid">
+        <li class="stage-card" data-index="0" tabindex="0" role="button" aria-label="Открыть этап 1: настройка персонажа">
+          <div class="stage-media">
+            <img src="stages/sm/1.jpg" alt="Этап 1: настройка персонажа" loading="lazy" decoding="async" draggable="false">
+            <span class="stage-num">01</span>
+          </div>
+          <p class="stage-caption">Настройка персонажа</p>
+        </li>
+        <li class="stage-card" data-index="1" tabindex="0" role="button" aria-label="Открыть этап 2: настройка позы">
+          <div class="stage-media">
+            <img src="stages/sm/2.jpg" alt="Этап 2: настройка позы" loading="lazy" decoding="async" draggable="false">
+            <span class="stage-num">02</span>
+          </div>
+          <p class="stage-caption">Настройка позы</p>
+        </li>
+        <li class="stage-card" data-index="2" tabindex="0" role="button" aria-label="Открыть этап 3: освещение и материал">
+          <div class="stage-media">
+            <img src="stages/sm/3.jpg" alt="Этап 3: освещение и материал на теле" loading="lazy" decoding="async" draggable="false">
+            <span class="stage-num">03</span>
+          </div>
+          <p class="stage-caption">Освещение и материал на теле</p>
+        </li>
+        <li class="stage-card" data-index="3" tabindex="0" role="button" aria-label="Открыть этап 4: итог">
+          <div class="stage-media">
+            <img src="stages/sm/4.jpg" alt="Этап 4: итог" loading="lazy" decoding="async" draggable="false">
+            <span class="stage-num">04</span>
+          </div>
+          <p class="stage-caption">Итог</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
   <!-- TEXTURE COMPARISON -->
   <section id="textures" style="background: var(--bg);">
     <div class="wrap">
@@ -2068,28 +2150,33 @@
   var lightboxFiles = [];
   var lightboxIndex = 0;
   var lightboxTouchX = null;
+  var lightboxMode = 'portfolio';
+  var STAGE_FILES = ['stages/1.jpg', 'stages/2.jpg', 'stages/3.jpg', 'stages/4.jpg'];
 
   function showLightboxSlide() {
     var file = lightboxFiles[lightboxIndex];
     if (!file || !lightboxImg) return;
-    lightboxImg.src = portfolioImageUrl(file);
-    lightboxImg.alt = 'Работа Dylan.Posing: ' + file.replace(/\.[^.]+$/, '');
+    if (lightboxMode === 'stages') {
+      lightboxImg.src = file;
+      lightboxImg.alt = 'Этап разработки ' + (lightboxIndex + 1);
+    } else {
+      lightboxImg.src = portfolioImageUrl(file);
+      lightboxImg.alt = 'Работа Dylan.Posing: ' + file.replace(/\.[^.]+$/, '');
+    }
     if (lightboxCounter) {
       lightboxCounter.textContent = (lightboxIndex + 1) + ' / ' + lightboxFiles.length;
     }
   }
 
-  function openLightbox(fileName) {
+  function openViewer(files, index, mode) {
     lightboxEl = document.getElementById('lightbox');
     lightboxImg = document.getElementById('lightbox-img');
     lightboxCounter = document.getElementById('lightbox-counter');
-    if (!lightboxEl || !lightboxImg) return;
+    if (!lightboxEl || !lightboxImg || !files.length) return;
 
-    lightboxFiles = (galleryFiles.length ? galleryFiles : PORTFOLIO_FALLBACK).slice();
-    if (!lightboxFiles.length) return;
-
-    var index = fileName ? lightboxFiles.indexOf(fileName) : -1;
-    lightboxIndex = index >= 0 ? index : 0;
+    lightboxMode = mode || 'portfolio';
+    lightboxFiles = files.slice();
+    lightboxIndex = index >= 0 && index < files.length ? index : 0;
 
     showLightboxSlide();
     lightboxEl.classList.add('is-open');
@@ -2101,6 +2188,15 @@
 
     var closeBtn = lightboxEl.querySelector('.lightbox__close');
     if (closeBtn) closeBtn.focus();
+  }
+
+  function openLightbox(fileName) {
+    var files = (galleryFiles.length ? galleryFiles : PORTFOLIO_FALLBACK).slice();
+    openViewer(files, fileName ? files.indexOf(fileName) : -1, 'portfolio');
+  }
+
+  function openStageLightbox(index) {
+    openViewer(STAGE_FILES, index, 'stages');
   }
 
   function stepLightbox(delta) {
@@ -2128,6 +2224,11 @@
 
   document.addEventListener('click', function (e) {
     if (!e.target.closest) return;
+    var stage = e.target.closest('.stage-card');
+    if (stage) {
+      openStageLightbox(parseInt(stage.getAttribute('data-index'), 10) || 0);
+      return;
+    }
     var work = e.target.closest('.work');
     if (!work) return;
     openLightbox(workFileName(work));
@@ -2142,6 +2243,12 @@
       return;
     }
     if (e.key === 'Enter' || e.key === ' ') {
+      var stage = e.target.closest ? e.target.closest('.stage-card') : null;
+      if (stage) {
+        e.preventDefault();
+        openStageLightbox(parseInt(stage.getAttribute('data-index'), 10) || 0);
+        return;
+      }
       var work = e.target.closest ? e.target.closest('.work') : null;
       if (!work) return;
       e.preventDefault();
