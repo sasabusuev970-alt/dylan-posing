@@ -605,6 +605,51 @@
   }
   .lightbox__hint { position: absolute; bottom: 22px; right: 24px; color: #6f6981; font-size: .78rem; }
 
+  /* ---------- Модалка «Ссылка на референс» ---------- */
+  .refmodal {
+    position: fixed; inset: 0; z-index: 320;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; background: rgba(7, 6, 11, .94);
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity .25s ease, visibility .25s ease;
+  }
+  .refmodal.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+  .refmodal__box {
+    width: min(520px, 100%); padding: 26px 24px;
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--accent); border-radius: var(--radius);
+    box-shadow: 0 0 40px rgba(139, 92, 246, .25);
+    transform: translateY(10px) scale(.98); transition: transform .25s ease;
+  }
+  .refmodal.is-open .refmodal__box { transform: none; }
+  .refmodal__title {
+    font-family: var(--font-head); font-size: 1.15rem;
+    letter-spacing: .04em; margin-bottom: 6px;
+  }
+  .refmodal__sub { color: var(--muted); font-size: .9rem; line-height: 1.45; margin-bottom: 16px; }
+  .refmodal__field {
+    width: 100%; padding: 14px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); color: var(--text); font-family: var(--font-body);
+    font-size: 1rem; transition: border-color .3s, box-shadow .3s;
+  }
+  .refmodal__field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+  .refmodal__error {
+    display: none; margin-top: 10px; padding: 10px 12px;
+    border: 1px solid #7a2b4a; border-radius: var(--radius);
+    background: rgba(122, 43, 74, .18); color: #f0b9cf;
+    font-size: .88rem; line-height: 1.45;
+  }
+  .refmodal__error.is-visible { display: block; }
+  .refmodal__actions { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+  .refmodal__actions .btn { flex: 1; min-width: 140px; }
+  .refmodal__cancel {
+    background: transparent; border: 1px solid var(--line); color: var(--muted);
+    padding: 12px 20px; border-radius: var(--radius); font-family: var(--font-head);
+    font-size: .9rem; letter-spacing: .04em; cursor: pointer;
+    transition: border-color .3s, color .3s;
+  }
+  .refmodal__cancel:hover { border-color: var(--accent); color: var(--text); }
+
   /* ---------- Responsive ---------- */
   @media (max-width: 960px) {
     .work { width: 220px; }
@@ -622,6 +667,10 @@
     .radio-group { flex-direction: column; gap: 12px; }
     .calc-display .price-value { font-size: 3rem; }
     .lightbox { padding: 14px; }
+    .refmodal { padding: 14px; }
+    .refmodal__box { padding: 20px 16px; }
+    .refmodal__actions { flex-direction: column; }
+    .refmodal__actions .btn { min-width: 0; }
     .lightbox__close, .lightbox__nav { width: 44px; height: 44px; font-size: 1.35rem; }
     .lightbox__close { top: 12px; right: 12px; }
     .lightbox__nav--prev { left: 8px; }
@@ -1170,7 +1219,7 @@
         </details>
         <details class="faq-item">
           <summary>Можно добавить предметы в руки?</summary>
-          <p>Да, до 2 предметов на человека — по одному в каждую руку. Каждый предмет +5 руб. или +6 R$.</p>
+          <p>Да, до 2 предметов на человека — по одному в каждую руку. Каждый предмет +5 руб. или +6 R$. Предметы я беру из Toolbox в Roblox Studio: если нужного там нет — предложу другой или найду похожий.</p>
         </details>
         <details class="faq-item">
           <summary>Какие правки бесплатные?</summary>
@@ -1241,7 +1290,7 @@
           <textarea id="bg_desc" placeholder="Темный лес со светящимися цветами..."></textarea>
           <div class="preset-buttons">
             <button type="button" class="preset-btn" onclick="insertText('bg_desc', 'На ваше усмотрение')">На ваше усмотрение</button>
-            <button type="button" class="preset-btn" onclick="insertText('bg_desc', 'Референс: ')">Ссылка на референс</button>
+            <button type="button" class="preset-btn" onclick="openRefModal('bg_desc')">Ссылка на референс</button>
           </div>
         </div>
 
@@ -1250,7 +1299,7 @@
           <textarea id="pose_desc" placeholder="Держатся за руки и смотрят на луну..."></textarea>
           <div class="preset-buttons">
             <button type="button" class="preset-btn" onclick="insertText('pose_desc', 'На ваше усмотрение')">На ваше усмотрение</button>
-            <button type="button" class="preset-btn" onclick="insertText('pose_desc', 'Референс: ')">Ссылка на референс</button>
+            <button type="button" class="preset-btn" onclick="openRefModal('pose_desc')">Ссылка на референс</button>
           </div>
         </div>
 
@@ -1269,8 +1318,9 @@
           <input type="text" id="props" placeholder="Меч, роза...">
           <div class="preset-buttons">
             <button type="button" class="preset-btn" onclick="insertText('props', 'На ваше усмотрение')">На ваше усмотрение</button>
-            <button type="button" class="preset-btn" onclick="insertText('props', 'Референс: ')">Ссылка на референс</button>
+            <button type="button" class="preset-btn" onclick="openRefModal('props')">Ссылка на референс</button>
           </div>
+          <div class="field-hint">Предметы в руках я беру из Toolbox в Roblox Studio. Если такого предмета там нет — предложу другой или попробую найти похожий.</div>
         </div>
 
         <div class="form-group">
@@ -1278,7 +1328,7 @@
           <textarea id="wishes" placeholder="Добавьте светящиеся эффекты..."></textarea>
           <div class="preset-buttons">
             <button type="button" class="preset-btn" onclick="insertText('wishes', 'На ваше усмотрение')">На ваше усмотрение</button>
-            <button type="button" class="preset-btn" onclick="insertText('wishes', 'Референс: ')">Ссылка на референс</button>
+            <button type="button" class="preset-btn" onclick="openRefModal('wishes')">Ссылка на референс</button>
           </div>
         </div>
 
@@ -1327,6 +1377,20 @@
   <button type="button" class="lightbox__nav lightbox__nav--next" aria-label="Следующая работа">›</button>
   <div class="lightbox__counter" id="lightbox-counter"></div>
   <div class="lightbox__hint">← → листать · Esc закрыть</div>
+</div>
+
+<!-- Модалка: ссылка на референс -->
+<div class="refmodal" id="refmodal" role="dialog" aria-modal="true" aria-labelledby="refmodal-title" aria-hidden="true">
+  <div class="refmodal__box">
+    <div class="refmodal__title" id="refmodal-title">Ссылка на референс</div>
+    <p class="refmodal__sub">Вставьте ссылку на референс: Pinterest, Google Диск, Telegram, сайт или картинку. Здесь нужна только ссылка — текст пишите прямо в поле формы.</p>
+    <input type="text" class="refmodal__field" id="refmodal-input" placeholder="https://..." autocomplete="off" spellcheck="false">
+    <div class="refmodal__error" id="refmodal-error" role="alert"></div>
+    <div class="refmodal__actions">
+      <button type="button" class="btn" onclick="applyRefLink()">Добавить ссылку</button>
+      <button type="button" class="refmodal__cancel" onclick="closeRefModal()">Отмена</button>
+    </div>
+  </div>
 </div>
 
   <button id="scrollTopBtn" title="Наверх">↑</button>
@@ -1444,6 +1508,101 @@
       }
     }
   }
+
+  // ---------- Модалка «Ссылка на референс» ----------
+  var refModalFieldId = null;
+
+  function openRefModal(fieldId) {
+    var modal = document.getElementById('refmodal');
+    var input = document.getElementById('refmodal-input');
+    var error = document.getElementById('refmodal-error');
+    if (!modal || !input) return;
+    refModalFieldId = fieldId;
+    input.value = '';
+    if (error) { error.textContent = ''; error.classList.remove('is-visible'); }
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('has-lightbox');
+    window.setTimeout(function () { input.focus(); }, 60);
+  }
+
+  function closeRefModal() {
+    var modal = document.getElementById('refmodal');
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    var lightbox = document.getElementById('lightbox');
+    if (!lightbox || !lightbox.classList.contains('is-open')) {
+      document.body.classList.remove('has-lightbox');
+    }
+    refModalFieldId = null;
+  }
+
+  function showRefError(message) {
+    var error = document.getElementById('refmodal-error');
+    if (!error) return;
+    error.textContent = message;
+    error.classList.add('is-visible');
+  }
+
+  // Приводит ввод к ссылке. null — если это не ссылка (например, обычный текст).
+  function normalizeRefUrl(raw) {
+    var value = (raw || '').trim();
+    if (!value) return null;
+    if (/\s/.test(value)) return null;                            // пробелы → это текст, а не ссылка
+    if (/^https?:\/\/[^\s.]+\.[^\s]+$/i.test(value)) return value; // полная ссылка
+    if (/^www\.[^\s.]+\.[^\s]+$/i.test(value)) return 'https://' + value;
+    if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/[^\s]*)?$/i.test(value)) return 'https://' + value;
+    return null;
+  }
+
+  function insertRefText(fieldId, url) {
+    var field = document.getElementById(fieldId);
+    if (!field) return;
+    field.style.display = 'block';
+    var line = 'Референс: ' + url;
+    if (field.value.length > 0 && field.value !== 'На ваше усмотрение') {
+      field.value += '\n' + line;
+    } else {
+      field.value = line;
+    }
+    field.focus();
+    field.setSelectionRange(field.value.length, field.value.length);
+  }
+
+  function applyRefLink() {
+    var input = document.getElementById('refmodal-input');
+    if (!input) return;
+    var raw = input.value.trim();
+    if (!raw) {
+      showRefError('Вставьте ссылку — без ссылки добавлять нечего.');
+      return;
+    }
+    var url = normalizeRefUrl(raw);
+    if (!url) {
+      showRefError('Это текст, а не ссылка. Такой текст можно просто написать в поле формы — а здесь нужна только ссылка, например https://pinterest.com/...');
+      return;
+    }
+    insertRefText(refModalFieldId, url);
+    closeRefModal();
+  }
+
+  document.addEventListener('keydown', function (e) {
+    var modal = document.getElementById('refmodal');
+    if (!modal || !modal.classList.contains('is-open')) return;
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      closeRefModal();
+    } else if (e.key === 'Enter' && e.target && e.target.id === 'refmodal-input') {
+      e.preventDefault();
+      applyRefLink();
+    }
+  }, true);
+
+  document.addEventListener('click', function (e) {
+    var modal = document.getElementById('refmodal');
+    if (modal && e.target === modal) closeRefModal();
+  });
 
   // Защита от скачивания картинок (ПКМ)
   document.addEventListener('contextmenu', function(e) {
