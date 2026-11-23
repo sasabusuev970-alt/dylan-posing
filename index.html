@@ -680,7 +680,12 @@
       padding-inline: 10px;
     }
   }
-  @media (max-width: 400px) {
+  @media (max-width: 640px) {
+    /* на телефонах оставляем только ключевые ссылки */
+    .topbar__nav a[data-section="portfolio"],
+    .topbar__nav a[data-section="faq"] { display: none; }
+  }
+  @media (max-width: 480px) {
     .topbar__inner { gap: 6px; }
     .topbar__brand { font-size: .92rem; letter-spacing: .04em; }
     .topbar__nav a { padding: 7px 6px; font-size: .76rem; }
