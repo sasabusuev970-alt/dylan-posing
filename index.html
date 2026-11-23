@@ -692,6 +692,13 @@
     .topbar__nav a::after { left: 6px; right: 6px; }
     .topbar__nav .topbar__cta { padding: 7px 10px; }
   }
+  @media (max-width: 380px) {
+    .topbar__brand { font-size: .86rem; letter-spacing: .02em; }
+    .topbar__nav { gap: 2px; }
+    .topbar__nav a { padding: 7px 5px; font-size: .72rem; }
+    .topbar__nav a::after { left: 5px; right: 5px; }
+    .topbar__nav .topbar__cta { padding: 7px 8px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .gallery-track { animation: none; }
