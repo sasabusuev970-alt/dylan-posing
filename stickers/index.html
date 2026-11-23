@@ -4,17 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dylan.Posing | Стикеры на заказ</title>
-<meta name="description" content="Стикеры на заказ по вашему персонажу Roblox: наборы с прозрачным фоном для Telegram, WhatsApp и печати. Раздел скоро откроется.">
+<meta name="description" content="Стикеры на заказ по вашему персонажу — Roblox, OC, герои фандомов. Анимированные, с прозрачным фоном: для Telegram, видео и TikTok. Скоро.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Dylan.Posing">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:title" content="Dylan.Posing | Стикеры на заказ">
-<meta property="og:description" content="Наборы стикеров по вашему персонажу Roblox — для мессенджеров и печати. Скоро.">
+<meta property="og:description" content="Наборы стикеров по вашему персонажу — для Telegram, видео и TikTok. Скоро.">
 <meta property="og:url" content="https://dylan-posing.online/stickers/">
 <meta property="og:image" content="https://dylan-posing.online/og-cover.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Dylan.Posing | Стикеры на заказ">
-<meta name="twitter:description" content="Наборы стикеров по вашему персонажу Roblox — для мессенджеров и печати. Скоро.">
+<meta name="twitter:description" content="Наборы стикеров по вашему персонажу — для Telegram, видео и TikTok. Скоро.">
 <meta name="twitter:image" content="https://dylan-posing.online/og-cover.jpg">
 <link rel="canonical" href="https://dylan-posing.online/stickers/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -147,16 +147,37 @@
     color: #e9d5ff; border: 1px solid var(--accent); border-radius: 999px;
     background: rgba(139, 92, 246, .14); box-shadow: 0 0 22px rgba(139, 92, 246, .25);
   }
+  .hero__inner {
+    display: grid; grid-template-columns: 1.05fr .95fr; align-items: center;
+    gap: 48px; text-align: left;
+  }
+  .hero__text { max-width: 48ch; }
+  .hero__art { position: relative; display: grid; place-items: center; isolation: isolate; }
+  .hero__art::before {
+    content: ""; position: absolute; z-index: -1;
+    width: 82%; aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle, rgba(139, 92, 246, .42), rgba(76, 29, 149, .18) 55%, transparent 72%);
+    filter: blur(38px);
+  }
+  .hero__sticker {
+    width: min(100%, 420px); height: auto;
+    filter: drop-shadow(0 18px 40px rgba(0, 0, 0, .55)) drop-shadow(0 0 26px rgba(139, 92, 246, .25));
+    animation: floaty 6s ease-in-out infinite;
+  }
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
   .hero h1 {
     font-size: clamp(2.6rem, 9vw, 5.4rem); font-weight: 900; letter-spacing: 0.06em;
     color: #f4f1fa; text-shadow: 0 0 40px var(--accent-glow), 0 0 90px rgba(76, 29, 149, 0.4);
   }
   .hero h1 .dot { color: var(--accent); text-shadow: 0 0 24px var(--accent-glow); }
   .hero p {
-    margin: 22px auto 40px; max-width: 46ch; color: #c9c3da; font-size: clamp(1rem, 2.4vw, 1.2rem);
+    margin: 22px 0 40px; max-width: 40ch; color: #c9c3da; font-size: clamp(1rem, 2.4vw, 1.2rem);
     letter-spacing: 0.04em;
   }
-  .hero__actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .hero__actions { display: flex; gap: 14px; justify-content: flex-start; flex-wrap: wrap; }
 
   .btn {
     display: inline-block; padding: 16px 40px; font-family: var(--font-head);
@@ -177,33 +198,6 @@
   .btn--ghost:hover {
     color: var(--text); border-color: var(--accent);
     box-shadow: 0 0 22px rgba(139, 92, 246, .25);
-  }
-
-  /* ---------- Примеры стикеров ---------- */
-  .sticker-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 22px; max-width: 780px;
-  }
-  .sticker { margin: 0; }
-  .sticker__frame {
-    position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center;
-    padding: 10px; border: 1px solid var(--line); border-radius: var(--radius);
-    background-color: #100e18;
-    background-image:
-      linear-gradient(45deg, #16131f 25%, transparent 25%, transparent 75%, #16131f 75%),
-      linear-gradient(45deg, #16131f 25%, transparent 25%, transparent 75%, #16131f 75%);
-    background-size: 22px 22px;
-    background-position: 0 0, 11px 11px;
-    transition: border-color .35s, box-shadow .35s;
-  }
-  .sticker:hover .sticker__frame {
-    border-color: var(--accent);
-    box-shadow: 0 0 26px rgba(139, 92, 246, .2);
-  }
-  .sticker__frame img { width: 100%; height: 100%; object-fit: contain; }
-  .sticker figcaption {
-    margin-top: 10px; text-align: center; color: var(--muted); font-size: .9rem;
-    letter-spacing: .03em;
   }
 
   /* ---------- Карточки ---------- */
@@ -252,6 +246,11 @@
   .footer-copy { opacity: .8; }
 
   @media (max-width: 900px) {
+    .hero__inner { grid-template-columns: 1fr; text-align: center; gap: 34px; }
+    .hero__text { margin-inline: auto; }
+    .hero p { margin-inline: auto; }
+    .hero__actions { justify-content: center; }
+    .hero__sticker { width: min(64%, 300px); }
     .cards { grid-template-columns: 1fr; max-width: 520px; }
   }
   @media (max-width: 640px) {
@@ -295,34 +294,23 @@
 </nav>
 
 <header class="hero">
-  <div class="wrap">
-    <div class="badge">Скоро</div>
-    <h1>Стикеры<span class="dot">.</span></h1>
-    <p>Наборы стикеров по вашему персонажу Roblox — для Telegram, WhatsApp и печати</p>
-    <div class="hero__actions">
-      <a href="../" class="btn btn--ghost">На главную</a>
-      <a href="https://www.tiktok.com/@dylan_993l" class="btn" target="_blank" rel="noopener">Следить за запуском</a>
+  <div class="wrap hero__inner">
+    <div class="hero__text">
+      <div class="badge">Скоро</div>
+      <h1>Стикеры<span class="dot">.</span></h1>
+      <p>Наборы стикеров по вашему персонажу — для Telegram, видео и TikTok</p>
+      <div class="hero__actions">
+        <a href="../" class="btn btn--ghost">На главную</a>
+        <a href="https://www.tiktok.com/@dylan_993l" class="btn" target="_blank" rel="noopener">Следить за запуском</a>
+      </div>
+    </div>
+    <div class="hero__art">
+      <img class="hero__sticker" src="media/dylan-loading.webp" alt="Анимированный стикер Dylan" width="512" height="512" decoding="async">
     </div>
   </div>
 </header>
 
 <main>
-  <section id="examples">
-    <div class="wrap">
-      <h2>Примеры</h2>
-      <div class="rule"></div>
-      <p class="section-intro">Стикеры анимированные, с прозрачным фоном, 512×512 — готовы для Telegram, WhatsApp и Discord.</p>
-      <div class="sticker-grid">
-        <figure class="sticker">
-          <div class="sticker__frame">
-            <img src="media/dylan-loading.webp" alt="Стикер Dylan — загрузка" width="512" height="512" loading="lazy" decoding="async">
-          </div>
-          <figcaption>Загрузка</figcaption>
-        </figure>
-      </div>
-    </div>
-  </section>
-
   <section id="about">
     <div class="wrap">
       <h2>Что здесь будет</h2>
@@ -332,12 +320,12 @@
         <div class="card">
           <div class="card__num">01</div>
           <h3>Набор по вашему персонажу</h3>
-          <p>Стикеры с вашим Roblox-аватаром: эмоции, позы, детали одежды и аксессуары — всё по вашим референсам.</p>
+          <p>Не только Roblox: OC, персонаж из фандома, аватар — стикеры по вашим референсам.</p>
         </div>
         <div class="card">
           <div class="card__num">02</div>
           <h3>Прозрачный фон</h3>
-          <p>PNG и WebP с прозрачностью: готово для Telegram, WhatsApp, Discord и печати наклеек.</p>
+          <p>Анимированные WebP и PNG с прозрачностью: для Telegram, вставок в видео и TikTok.</p>
         </div>
         <div class="card">
           <div class="card__num">03</div>
