@@ -61,7 +61,7 @@
   input, textarea, select, .result-text, #result-text {
     -webkit-user-select: text; -ms-user-select: text; user-select: text;
   }
-  html { scroll-behavior: smooth; scroll-padding-top: 86px; }
+  html { scroll-behavior: smooth; scroll-padding-top: 130px; }
   body {
     background: var(--bg); color: var(--text); font-family: var(--font-body);
     line-height: 1.65; -webkit-font-smoothing: antialiased; overflow-x: hidden;
@@ -144,6 +144,34 @@
     .topbar__nav a { padding: 8px 9px; font-size: 0.82rem; }
     .topbar__nav a::after { left: 9px; right: 9px; }
     .topbar__cta { padding: 8px 13px; }
+  }
+
+  /* ---------- Подменю разделов ---------- */
+  .subnav {
+    position: fixed; top: 64px; left: 0; right: 0; z-index: 95;
+    background: rgba(10, 8, 16, 0.88);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .subnav__inner {
+    width: min(1120px, 100% - 40px); margin-inline: auto;
+    display: flex; gap: 4px; overflow-x: auto;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .subnav__inner::-webkit-scrollbar { display: none; }
+  .subnav a {
+    flex: 0 0 auto; padding: 15px 14px; color: var(--muted); text-decoration: none;
+    font-size: .92rem; letter-spacing: .04em; white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color .25s ease, border-color .25s ease;
+  }
+  .subnav a:hover { color: var(--text); }
+  .subnav a.is-active { color: var(--text); border-bottom-color: var(--accent); }
+
+  @media (max-width: 560px) {
+    .subnav { top: 56px; }
+    .subnav a { padding: 13px 12px; font-size: .86rem; }
   }
 
   /* ---------- Hero ---------- */
@@ -680,11 +708,6 @@
       padding-inline: 10px;
     }
   }
-  @media (max-width: 640px) {
-    /* на телефонах оставляем только ключевые ссылки */
-    .topbar__nav a[data-section="portfolio"],
-    .topbar__nav a[data-section="faq"] { display: none; }
-  }
   @media (max-width: 480px) {
     .topbar__inner { gap: 6px; }
     .topbar__brand { font-size: .92rem; letter-spacing: .04em; }
@@ -967,12 +990,19 @@
   <div class="topbar__inner">
     <a class="topbar__brand" href="#top">Dylan<span>.</span></a>
     <div class="topbar__nav">
-      <a href="#portfolio" data-section="portfolio">Портфолио</a>
-      <a href="#pricing" data-section="pricing">Цены</a>
-      <a href="#faq" data-section="faq">FAQ</a>
+      <a href="#top" class="is-active" aria-current="page">Позинг</a>
       <a href="stickers/">Стикеры</a>
-      <a href="#order" class="topbar__cta" data-section="order">Заказать</a>
+      <a href="#order" class="topbar__cta">Заказать</a>
     </div>
+  </div>
+</nav>
+
+<nav class="subnav" aria-label="Разделы страницы">
+  <div class="subnav__inner">
+    <a href="#portfolio" class="is-active">Портфолио</a>
+    <a href="#pricing">Цены</a>
+    <a href="#addons">Дополнения</a>
+    <a href="#faq">FAQ</a>
   </div>
 </nav>
 
@@ -1414,38 +1444,42 @@
 
 <script>
 
-  // ---------- Липкая шапка: фон после скролла + подсветка активного пункта ----------
+  // ---------- Липкая шапка: фон после скролла ----------
   (function initTopbar() {
     var bar = document.getElementById('topbar');
     if (!bar) return;
-
-    var links = Array.prototype.slice.call(bar.querySelectorAll('[data-section]'));
 
     function onScroll() {
       bar.classList.toggle('is-scrolled', window.scrollY > 40);
     }
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+  })();
 
-    if (!('IntersectionObserver' in window)) return;
-
+  // ---------- Подменю: подсветка активного раздела ----------
+  (function initSubnav() {
+    var nav = document.querySelector('.subnav');
+    if (!nav) return;
+    var links = Array.prototype.slice.call(nav.querySelectorAll('a'));
     var byId = {};
     links.forEach(function (link) {
-      byId[link.getAttribute('data-section')] = link;
+      var id = (link.getAttribute('href') || '').replace('#', '');
+      if (id) byId[id] = link;
     });
 
+    function setActive(id) {
+      links.forEach(function (l) { l.classList.remove('is-active'); });
+      if (byId[id]) byId[id].classList.add('is-active');
+    }
+
+    if (!('IntersectionObserver' in window)) return;
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        var link = byId[entry.target.id];
-        if (!link) return;
-        if (entry.isIntersecting) {
-          links.forEach(function (l) { l.classList.remove('is-active'); });
-          link.classList.add('is-active');
-        }
+        if (entry.isIntersecting) setActive(entry.target.id);
       });
-    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+    }, { rootMargin: '-130px 0px -55% 0px', threshold: 0 });
 
-    ['portfolio', 'pricing', 'faq', 'order'].forEach(function (id) {
+    ['portfolio', 'pricing', 'addons', 'faq'].forEach(function (id) {
       var section = document.getElementById(id);
       if (section) observer.observe(section);
     });

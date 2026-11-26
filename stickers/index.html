@@ -580,6 +580,7 @@
             <div class="picker-toolbar">
               <input type="text" id="picker-search" placeholder="Поиск: смех, сон, танец..." oninput="filterStickerPicker(this.value)">
               <span class="picker-count" id="picker-count">Выбрано: <strong>0</strong></span>
+              <button type="button" class="preset-btn" id="picker-select-all" onclick="selectAllStickerPicks()">Выбрать всё</button>
               <button type="button" class="preset-btn" onclick="clearStickerPicker()">Сбросить</button>
             </div>
             <div class="picker-grid" id="picker-grid" role="group" aria-label="Примеры стикеров"></div>
@@ -829,6 +830,20 @@
     updateStickerPickCount();
   }
 
+  function selectAllStickerPicks() {
+    renderStickerPicker();
+    var grid = document.getElementById('picker-grid');
+    if (!grid) return;
+    Array.prototype.forEach.call(grid.children, function (el) {
+      if (el.hidden) return;
+      var name = el.dataset.name;
+      if (stickerPick.selected.indexOf(name) === -1) stickerPick.selected.push(name);
+      el.classList.add('is-selected');
+      el.setAttribute('aria-pressed', 'true');
+    });
+    updateStickerPickCount();
+  }
+
   function filterStickerPicker(query) {
     if (!stickerPick.rendered) return;
     var q = (query || '').trim().toLowerCase();
@@ -842,6 +857,8 @@
     });
     var empty = document.getElementById('picker-empty');
     if (empty) empty.hidden = visible !== 0;
+    var allBtn = document.getElementById('picker-select-all');
+    if (allBtn) allBtn.textContent = q ? 'Выбрать найденные' : 'Выбрать всё';
   }
 
   (function initStickerPickerLabel() {
