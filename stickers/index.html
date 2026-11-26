@@ -868,6 +868,22 @@
     updateStickerPickCount();
   })();
 
+  function stickerSelectionText() {
+    var items = stickerPickerItems();
+    var total = items.length;
+    var selected = stickerPick.selected.slice();
+    if (!selected.length || !total) return '';
+
+    var excluded = [];
+    items.forEach(function (item) {
+      if (selected.indexOf(item.n) === -1) excluded.push(item.n);
+    });
+
+    if (!excluded.length) return 'Стикеры: все виды';
+    if (selected.length > excluded.length) return 'Стикеры: все виды, кроме: ' + excluded.join(', ');
+    return 'Стикеры (' + selected.length + '): ' + selected.join(', ');
+  }
+
   function generateStickerOrder() {
     var heroDesc = stickerField('s_hero_desc');
     var hero = document.querySelector('input[name="s_hero"]:checked');
@@ -906,11 +922,9 @@
     text += 'Количество стикеров: ' + count + '\n';
     text += 'Куда: ' + (places.length ? places.join(', ') : 'не указано') + '\n';
 
-    if (stickerPick.selected.length) {
-      text += 'Понравившиеся примеры (' + stickerPick.selected.length + '): ' + stickerPick.selected.join(', ') + '\n';
-    } else {
-      text += 'Эмоции: на ваше усмотрение\n';
-    }
+    var pickText = stickerSelectionText();
+    if (pickText) text += pickText + '\n';
+    else text += 'Эмоции: на ваше усмотрение\n';
 
     var wishes = stickerField('s_wishes');
     if (wishes) text += 'Пожелания: ' + wishes + '\n';
