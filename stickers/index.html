@@ -517,7 +517,7 @@
         <div class="price-card">
           <div class="price-card__label">Рубли</div>
           <div class="price-card__value">5 ₽ <span>за стикер</span></div>
-          <p>Набор из 12 стикеров — 60 ₽, из 30 — 150 ₽. Максимум 132 стикера в заказе.</p>
+          <p>Набор из 12 стикеров — 60 ₽, из 30 — 150 ₽. Максимум 235 стикеров в заказе.</p>
         </div>
         <div class="price-card">
           <div class="price-card__label">Robux</div>
@@ -572,8 +572,8 @@
 
         <div class="form-group">
           <label for="s_count">Сколько стикеров?</label>
-          <input type="number" id="s_count" min="1" max="132" step="1" value="10" inputmode="numeric" oninput="updateStickerTotal()">
-          <div class="field-hint">От 1 до 132 стикеров в одном заказе.</div>
+          <input type="number" id="s_count" min="1" max="235" step="1" value="10" inputmode="numeric" oninput="updateStickerTotal()">
+          <div class="field-hint">От 1 до 235 стикеров в одном заказе.</div>
           <div class="sticker-total" id="sticker-total" aria-live="polite">Итого: <strong>50 ₽</strong> <span>5 ₽ × 10</span></div>
         </div>
 
@@ -629,7 +629,7 @@
       <div class="faq-list">
         <details class="faq-item">
           <summary>Сколько стоят стикеры?</summary>
-          <p>5 ₽ за стикер. Набор из 12 стикеров — 60 ₽, из 30 — 150 ₽. Максимум 132 стикера в одном заказе.</p>
+          <p>5 ₽ за стикер. Набор из 12 стикеров — 60 ₽, из 30 — 150 ₽. Максимум 235 стикеров в одном заказе.</p>
         </details>
         <details class="faq-item">
           <summary>Как можно оплатить?</summary>
@@ -721,7 +721,7 @@
     var el = document.getElementById('s_count');
     var n = parseInt(el ? el.value : '', 10);
     if (!n || n < 1) n = 1;
-    if (n > 132) n = 132;
+    if (n > 235) n = 235;
     return n;
   }
 
@@ -782,10 +782,11 @@
       btn.className = 'pick';
       btn.setAttribute('aria-pressed', 'false');
       btn.dataset.name = item.n;
+      btn.dataset.key = item.f;
       btn.innerHTML = '<img src="' + item.f + '" alt="" width="192" height="192" loading="lazy" decoding="async">' +
                       '<span class="pick__name"></span>';
       btn.querySelector('.pick__name').textContent = item.n;
-      btn.addEventListener('click', function () { toggleStickerPick(item.n, btn); });
+      btn.addEventListener('click', function () { toggleStickerPick(item.f, btn); });
       frag.appendChild(btn);
     });
     grid.appendChild(frag);
@@ -807,12 +808,12 @@
     }
   }
 
-  function toggleStickerPick(name, btn) {
-    var i = stickerPick.selected.indexOf(name);
-    if (i === -1) stickerPick.selected.push(name);
+  function toggleStickerPick(key, btn) {
+    var i = stickerPick.selected.indexOf(key);
+    if (i === -1) stickerPick.selected.push(key);
     else stickerPick.selected.splice(i, 1);
     if (btn) {
-      var on = stickerPick.selected.indexOf(name) !== -1;
+      var on = stickerPick.selected.indexOf(key) !== -1;
       btn.classList.toggle('is-selected', on);
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     }
@@ -845,8 +846,8 @@
     if (!grid) return;
     Array.prototype.forEach.call(grid.children, function (el) {
       if (el.hidden) return;
-      var name = el.dataset.name;
-      if (stickerPick.selected.indexOf(name) === -1) stickerPick.selected.push(name);
+      var key = el.dataset.key;
+      if (stickerPick.selected.indexOf(key) === -1) stickerPick.selected.push(key);
       el.classList.add('is-selected');
       el.setAttribute('aria-pressed', 'true');
     });
@@ -879,18 +880,21 @@
 
   function stickerSelectionText() {
     var items = stickerPickerItems();
-    var total = items.length;
-    var selected = stickerPick.selected.slice();
-    if (!selected.length || !total) return '';
+    if (!stickerPick.selected.length || !items.length) return '';
 
+    var picked = {};
+    stickerPick.selected.forEach(function (key) { picked[key] = true; });
+
+    var chosen = [];
     var excluded = [];
     items.forEach(function (item) {
-      if (selected.indexOf(item.n) === -1) excluded.push(item.n);
+      if (picked[item.f]) chosen.push(item.n);
+      else excluded.push(item.n);
     });
 
     if (!excluded.length) return 'Стикеры: все виды';
-    if (selected.length > excluded.length) return 'Стикеры: все виды, кроме: ' + excluded.join(', ');
-    return 'Стикеры (' + selected.length + '): ' + selected.join(', ');
+    if (chosen.length > excluded.length) return 'Стикеры: все виды, кроме: ' + excluded.join(', ');
+    return 'Стикеры (' + chosen.length + '): ' + chosen.join(', ');
   }
 
   function generateStickerOrder() {
@@ -909,9 +913,9 @@
     var countEl = document.getElementById('s_count');
     var count = parseInt(countEl ? countEl.value : '', 10);
     if (!count || count < 1) count = 1;
-    if (count > 132) {
-      alert('Пока делаю максимум 132 стикера в одном заказе.');
-      countEl.value = 132;
+    if (count > 235) {
+      alert('Пока делаю максимум 235 стикеров в одном заказе.');
+      countEl.value = 235;
       countEl.focus();
       return;
     }
