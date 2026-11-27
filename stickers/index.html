@@ -562,12 +562,7 @@
         </div>
 
         <div class="form-group hidden-field" id="s_screenshot_hint">
-          <div class="field-hint">Пришлите, пожалуйста, скрин вашего персонажа отдельным сообщением в TikTok — по нему я и нарисую стикеры.</div>
-        </div>
-
-        <div class="form-group">
-          <label for="s_hero_desc">Имя или описание персонажа</label>
-          <input type="text" id="s_hero_desc" placeholder="Как зовут, откуда персонаж, во что одет">
+          <div class="field-hint">Пришлите, пожалуйста, скрин вашего персонажа отдельным сообщением в TikTok — по нему я и соберу стикеры.</div>
         </div>
 
         <div class="form-group">
@@ -898,7 +893,6 @@
   }
 
   function generateStickerOrder() {
-    var heroDesc = stickerField('s_hero_desc');
     var hero = document.querySelector('input[name="s_hero"]:checked');
     var heroValue = hero ? hero.value : 'аватар Roblox';
     var isAvatar = heroValue === 'аватар Roblox';
@@ -926,9 +920,8 @@
     var text = 'Привет! Хочу заказать стикеры.\n\n';
     if (isAvatar) {
       text += 'Персонаж: аватар Roblox — ' + robloxNick + '\n';
-      if (heroDesc) text += 'Описание: ' + heroDesc + '\n';
     } else {
-      text += 'Персонаж: ' + heroValue + (heroDesc ? ' — ' + heroDesc : '') + '\n';
+      text += 'Персонаж: ' + heroValue + '\n';
       text += 'Референс: скрин персонажа скину отдельным сообщением\n';
     }
 
