@@ -316,6 +316,28 @@
     color: var(--muted); white-space: nowrap;
   }
   .picker-count strong { color: var(--accent); }
+  .picker-chips {
+    display: flex; gap: 8px; overflow-x: auto; margin-bottom: 12px;
+    padding-bottom: 4px; scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .picker-chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: 0 0 auto; padding: 8px 14px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+    font-family: var(--font-body); font-size: .84rem; line-height: 1.2; cursor: pointer;
+    white-space: nowrap; transition: border-color .25s, color .25s, background .25s, box-shadow .25s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--text); }
+  .chip.is-active {
+    border-color: var(--accent); color: var(--text);
+    background: rgba(139, 92, 246, .16); box-shadow: 0 0 12px rgba(139, 92, 246, .2);
+  }
+  .chip--picked.is-active { background: rgba(139, 92, 246, .3); }
+  .picker-presets {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .picker-presets__label { font-size: .82rem; color: var(--muted); }
+  .picker-preset-note { font-size: .82rem; color: var(--accent); min-height: 1.2em; margin-bottom: 8px; }
   .picker-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
     gap: 10px;
@@ -345,6 +367,12 @@
     background: var(--accent); border-radius: 50%;
   }
   .pick[hidden] { display: none; }
+  @media (max-width: 560px) {
+    .picker-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .pick { padding: 6px 6px 8px; font-size: .72rem; min-width: 0; }
+    .pick img { margin-bottom: 4px; }
+    .pick__name { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  }
   .radio-group { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 8px; }
   .radio-group label, .check-group label {
     display: flex; align-items: center; gap: 8px; font-family: var(--font-body);
@@ -583,6 +611,11 @@
               <button type="button" class="preset-btn" id="picker-select-all" onclick="selectAllStickerPicks()">Выбрать всё</button>
               <button type="button" class="preset-btn" onclick="clearStickerPicker()">Сбросить</button>
             </div>
+            <div class="picker-chips" id="picker-chips" role="group" aria-label="Категории стикеров"></div>
+            <div class="picker-presets" id="picker-presets" aria-label="Готовые наборы">
+              <span class="picker-presets__label">Готовые наборы:</span>
+            </div>
+            <div class="picker-preset-note" id="picker-preset-note" aria-live="polite"></div>
             <div class="picker-grid" id="picker-grid" role="group" aria-label="Примеры стикеров"></div>
             <p class="field-hint" id="picker-empty" hidden>Ничего не нашлось — попробуйте другое слово.</p>
           </div>
@@ -659,6 +692,7 @@
 </footer>
 
 <script src="picker-data.js"></script>
+<script src="picker-tags.js"></script>
 <script>
   (function () {
     var bar = document.getElementById('topbar');
@@ -759,10 +793,24 @@
     syncStickerHeroFields();
   })();
   // ---------- Выбор стикеров (примеры) ----------
-  var stickerPick = { selected: [], rendered: false, open: false };
+  var stickerPick = {
+    selected: [], rendered: false, open: false,
+    query: '', category: 'all', onlyPicked: false
+  };
 
   function stickerPickerItems() {
     return Array.isArray(window.STICKER_PICKER) ? window.STICKER_PICKER : [];
+  }
+
+  function stickerTagOf(item) {
+    var tags = window.STICKER_TAGS || {};
+    return tags[item.f] || 'other';
+  }
+
+  function stickerCategoryList() {
+    return Array.isArray(window.STICKER_CATEGORIES) && window.STICKER_CATEGORIES.length
+      ? window.STICKER_CATEGORIES
+      : [{ id: 'all', label: 'Все' }];
   }
 
   function renderStickerPicker() {
@@ -778,6 +826,7 @@
       btn.setAttribute('aria-pressed', 'false');
       btn.dataset.name = item.n;
       btn.dataset.key = item.f;
+      btn.dataset.tag = stickerTagOf(item);
       btn.innerHTML = '<img src="' + item.f + '" alt="" width="192" height="192" loading="lazy" decoding="async">' +
                       '<span class="pick__name"></span>';
       btn.querySelector('.pick__name').textContent = item.n;
@@ -786,8 +835,117 @@
     });
     grid.appendChild(frag);
     stickerPick.rendered = true;
+    buildStickerChips();
+    applyStickerFilter();
     var btnToggle = document.getElementById('picker-toggle');
     if (btnToggle) btnToggle.textContent = 'Показать стикеры (' + items.length + ')';
+  }
+
+  // ---------- Категории и готовые наборы ----------
+  function buildStickerChips() {
+    var box = document.getElementById('picker-chips');
+    if (!box || box.dataset.ready) return;
+
+    var items = stickerPickerItems();
+    var counts = {};
+    items.forEach(function (item) {
+      var tag = stickerTagOf(item);
+      counts[tag] = (counts[tag] || 0) + 1;
+    });
+
+    var picked = document.createElement('button');
+    picked.type = 'button';
+    picked.className = 'chip chip--picked';
+    picked.id = 'picker-chip-picked';
+    picked.textContent = 'Выбранные (0)';
+    picked.addEventListener('click', function () {
+      setStickerOnlyPicked(!stickerPick.onlyPicked);
+    });
+    box.appendChild(picked);
+
+    stickerCategoryList().forEach(function (cat) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'chip';
+      btn.dataset.cat = cat.id;
+      btn.textContent = cat.id === 'all'
+        ? 'Все (' + items.length + ')'
+        : cat.label + ' (' + (counts[cat.id] || 0) + ')';
+      btn.addEventListener('click', function () { setStickerCategory(cat.id); });
+      box.appendChild(btn);
+    });
+
+    box.dataset.ready = '1';
+    syncStickerChips();
+  }
+
+  function syncStickerChips() {
+    var box = document.getElementById('picker-chips');
+    if (!box) return;
+    Array.prototype.forEach.call(box.querySelectorAll('.chip[data-cat]'), function (btn) {
+      btn.classList.toggle('is-active', btn.dataset.cat === stickerPick.category);
+    });
+    var picked = document.getElementById('picker-chip-picked');
+    if (picked) {
+      picked.classList.toggle('is-active', stickerPick.onlyPicked);
+      picked.textContent = 'Выбранные (' + stickerPick.selected.length + ')';
+    }
+  }
+
+  function setStickerCategory(id) {
+    stickerPick.category = id;
+    stickerPick.onlyPicked = false;
+    syncStickerChips();
+    applyStickerFilter();
+  }
+
+  function setStickerOnlyPicked(on) {
+    stickerPick.onlyPicked = !!on;
+    if (on) stickerPick.category = 'all';
+    syncStickerChips();
+    applyStickerFilter();
+  }
+
+  function buildStickerPresets() {
+    var box = document.getElementById('picker-presets');
+    if (!box || box.dataset.ready) return;
+    var presets = Array.isArray(window.STICKER_PRESETS) ? window.STICKER_PRESETS : [];
+    presets.forEach(function (preset) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'preset-btn';
+      btn.textContent = preset.label;
+      btn.addEventListener('click', function () { addStickerPreset(preset); });
+      box.appendChild(btn);
+    });
+    box.dataset.ready = '1';
+  }
+
+  function addStickerPreset(preset) {
+    renderStickerPicker();
+    var grid = document.getElementById('picker-grid');
+    var keys = preset.f || [];
+    var added = 0;
+    keys.forEach(function (key) {
+      if (stickerPick.selected.indexOf(key) === -1) {
+        stickerPick.selected.push(key);
+        added++;
+      }
+      var el = grid ? grid.querySelector('.pick[data-key="' + key + '"]') : null;
+      if (el) {
+        el.classList.add('is-selected');
+        el.setAttribute('aria-pressed', 'true');
+      }
+    });
+    updateStickerPickCount();
+    var note = document.getElementById('picker-preset-note');
+    if (note) {
+      note.textContent = added
+        ? 'Добавлено: ' + added + ' — можно снять лишние'
+        : 'Эти стикеры уже выбраны';
+      clearTimeout(addStickerPreset.timer);
+      addStickerPreset.timer = setTimeout(function () { note.textContent = ''; }, 3000);
+    }
   }
 
   function toggleStickerPicker() {
@@ -820,6 +978,8 @@
     if (label) label.innerHTML = 'Выбрано: <strong>' + stickerPick.selected.length + '</strong>';
     var countInput = document.getElementById('s_count');
     if (countInput && stickerPick.selected.length > 0) countInput.value = String(stickerPick.selected.length);
+    syncStickerChips();
+    if (stickerPick.onlyPicked) applyStickerFilter();
     updateStickerTotal();
   }
 
@@ -850,26 +1010,54 @@
   }
 
   function filterStickerPicker(query) {
-    if (!stickerPick.rendered) return;
-    var q = (query || '').trim().toLowerCase();
+    stickerPick.query = query || '';
+    applyStickerFilter();
+  }
+
+  function applyStickerFilter() {
     var grid = document.getElementById('picker-grid');
-    if (!grid) return;
+    if (!grid || !stickerPick.rendered) return;
+
+    var q = (stickerPick.query || '').trim().toLowerCase();
+    var cat = stickerPick.category;
+    var only = stickerPick.onlyPicked;
+
+    var picked = {};
+    stickerPick.selected.forEach(function (key) { picked[key] = true; });
+
     var visible = 0;
     Array.prototype.forEach.call(grid.children, function (el) {
-      var match = !q || (el.dataset.name || '').toLowerCase().indexOf(q) !== -1;
-      el.hidden = !match;
-      if (match) visible++;
+      var name = (el.dataset.name || '').toLowerCase();
+      var tag = el.dataset.tag || 'other';
+      var ok = (!q || name.indexOf(q) !== -1) &&
+               (cat === 'all' || tag === cat) &&
+               (!only || picked[el.dataset.key]);
+      el.hidden = !ok;
+      if (ok) visible++;
     });
+
     var empty = document.getElementById('picker-empty');
-    if (empty) empty.hidden = visible !== 0;
+    if (empty) {
+      empty.hidden = visible !== 0;
+      empty.textContent = only && !stickerPick.selected.length
+        ? 'Пока ничего не выбрано — нажмите на стикеры, которые нравятся.'
+        : 'Ничего не нашлось — попробуйте другое слово или другую категорию.';
+    }
+
     var allBtn = document.getElementById('picker-select-all');
-    if (allBtn) allBtn.textContent = q ? 'Выбрать найденные' : 'Выбрать всё';
+    if (allBtn) {
+      allBtn.textContent = q
+        ? 'Выбрать найденные'
+        : (cat !== 'all' || only ? 'Выбрать в фильтре' : 'Выбрать всё');
+    }
   }
 
   (function initStickerPickerLabel() {
     var items = stickerPickerItems();
     var btn = document.getElementById('picker-toggle');
     if (btn && items.length) btn.textContent = 'Показать стикеры (' + items.length + ')';
+    buildStickerChips();
+    buildStickerPresets();
     updateStickerPickCount();
   })();
 
@@ -958,7 +1146,12 @@
     syncStickerHeroFields();
     clearStickerPicker();
     var search = document.getElementById('picker-search');
-    if (search) { search.value = ''; filterStickerPicker(''); }
+    if (search) { search.value = ''; }
+    stickerPick.query = '';
+    stickerPick.category = 'all';
+    stickerPick.onlyPicked = false;
+    syncStickerChips();
+    applyStickerFilter();
     document.getElementById('sticker-result').style.display = 'none';
     window.scrollTo({ top: document.getElementById('order').offsetTop - 90, behavior: 'smooth' });
   }
